@@ -1,0 +1,31 @@
+name: Build iOS Tweak
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Theos Environment
+        run: |
+          bash -c "$(curl -fsSL https://githubusercontent.com)"
+          echo "THEOS=~/theos" >> $GITHUB_ENV
+          echo "~/theos/bin" >> $GITHUB_PATH
+
+      - name: Compile Tweak (.dylib)
+        run: |
+          make package FINALPACKAGE=1
+
+      - name: Upload Finished File
+        uses: actions/upload-artifact@v4
+        with:
+          name: iOS-Executor-Dylib
+          path: packages/*.deb
+
